@@ -20,7 +20,7 @@ namespace EclipseRevamped
     public const string PluginGUID = PluginAuthor + "." + PluginName;
     public const string PluginAuthor = "Nuxlar";
     public const string PluginName = "EclipseRevamped";
-    public const string PluginVersion = "1.1.1";
+    public const string PluginVersion = "1.1.2";
 
     internal static Main Instance { get; private set; }
     public static string PluginDirectory { get; private set; }
@@ -77,11 +77,14 @@ namespace EclipseRevamped
       if (shouldChangeE5.Value)
       {
         IL.RoR2.HealthComponent.Heal += RemoveVanillaE5;
+        On.RoR2.Run.Start += AddNewE5;
+        /*
         IL.RoR2.CombatDirector.CalcHighestEliteCostMultiplier += NewE5Hook1;
         MethodInfo target2 = typeof(CombatDirector).GetPropertyGetter(nameof(CombatDirector.lowestEliteCostMultiplier));
         Hook hook2 = new Hook(target2, NewE5Hook2);
         IL.RoR2.CombatDirector.PrepareNewMonsterWave += NewE5Hook3;
         IL.RoR2.CombatDirector.AttemptSpawnOnTarget += NewE5Hook4;
+        */
       }
       if (shouldChangeE6.Value)
       {
@@ -95,6 +98,29 @@ namespace EclipseRevamped
 
       stopwatch.Stop();
       Log.Info_NoCallerPrefix($"Initialized in {stopwatch.Elapsed.TotalSeconds:F2} seconds");
+    }
+    private void AddNewE5(On.RoR2.Run.orig_Start orig, Run self)
+    {
+      orig(self);
+      if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5)
+      {
+        EliteTierDef t1Tier = EliteAPI.VanillaEliteTiers[1];
+        t1Tier.costMultiplier = 4.5f;
+        EliteTierDef t1GildedTier = EliteAPI.VanillaEliteTiers[4];
+        t1GildedTier.costMultiplier = 4.5f;
+        EliteTierDef t2Tier = EliteAPI.VanillaEliteTiers[5];
+        t2Tier.costMultiplier = 13.5f;
+      }
+      else
+      {
+        EliteTierDef t1Tier = EliteAPI.VanillaEliteTiers[1];
+        t1Tier.costMultiplier = 6f;
+        EliteTierDef t1GildedTier = EliteAPI.VanillaEliteTiers[4];
+        t1GildedTier.costMultiplier = 6f;
+        EliteTierDef t2Tier = EliteAPI.VanillaEliteTiers[5];
+        t2Tier.costMultiplier = 18f;
+      }
+
     }
 
     private void AddNewE6(On.RoR2.CombatDirector.orig_Init orig)
@@ -328,7 +354,7 @@ namespace EclipseRevamped
       string str3 = shouldChangeE2.Value ? "\n<mspace=0.5em>(2)</mspace> Larger Enemies <style=cIsHealth>appear more often</style></style>" : "\n<mspace=0.5em>(2)</mspace> Teleporter Radius: <style=cIsHealth>-50%</style></style>";
       string str4 = shouldChangeE3.Value ? "\n<mspace=0.5em>(3)</mspace> Enemy Attack Speed: <style=cIsHealth>+25%</style></style>" : "\n<mspace=0.5em>(3)</mspace> Ally Fall Damage: <style=cIsHealth>+100% and lethal</style></style>";
       string str5 = shouldChangeE4.Value ? "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+50% Faster</style></style>" : "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+40% Faster</style></style>";
-      string str6 = shouldChangeE5.Value ? "\n<mspace=0.5em>(5)</mspace> Enemy Elites: <style=cIsHealth>+20%</style></style>" : "\n<mspace=0.5em>(5)</mspace> Ally Healing: <style=cIsHealth>-50%</style></style>";
+      string str6 = shouldChangeE5.Value ? "\n<mspace=0.5em>(5)</mspace> Enemy Elites: <style=cIsHealth>+25%</style></style>" : "\n<mspace=0.5em>(5)</mspace> Ally Healing: <style=cIsHealth>-50%</style></style>";
       string str7 = shouldChangeE6.Value ? "\n<mspace=0.5em>(6)</mspace> Tier 2 Elites <style=cIsHealth>appear earlier</style></style>" : "\n<mspace=0.5em>(6)</mspace> Enemy Gold Drops: <style=cIsHealth>-20%</style></style>";
       string str8 = shouldChangeE7.Value ? "\n<mspace=0.5em>(7)</mspace> Enemy Cooldowns: <style=cIsHealth>-25%</style></style>" : "\n<mspace=0.5em>(7)</mspace> Enemy Cooldowns: <style=cIsHealth>-50%</style></style>";
       string str9 = "\n<mspace=0.5em>(8)</mspace> Allies recieve <style=cIsHealth>permanent damage</style></style>";

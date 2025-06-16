@@ -1,3 +1,7 @@
+**1.1.2**
+
+- Fixed the spawns being too excessive
+
 **1.1.1**
 
 - Fixed the image in README
