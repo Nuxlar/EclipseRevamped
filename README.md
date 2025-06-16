@@ -21,4 +21,4 @@ Revamps the Eclipse difficulty system. There's a config to enable/disable change
 - The new E6 (T2 elites) means elites will appear Stage 4 onwards
 - The E8 changes can be configured/disabled through CurseCatcher
 
-[e8.png](https://i.postimg.cc/pVCBXtJS/e8.png)(https://postimg.cc/PNLD29cb)
+![e8.png](https://i.postimg.cc/pVCBXtJS/e8.png)

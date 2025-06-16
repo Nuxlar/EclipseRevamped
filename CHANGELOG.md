@@ -1,3 +1,7 @@
+**1.1.1**
+
+- Fixed the image in README
+
 **1.1.0**
 
 - Completely Reworked
