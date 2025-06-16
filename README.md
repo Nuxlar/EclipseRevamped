@@ -1,36 +1,35 @@
 # Eclipse Revamped
 
+Revamps the Eclipse difficulty system, you can uninstall/disable CurseCatcher if you want self damage to apply curse.
+
 ### Eclipse 1
 
-Starting Health -50%
+Teleporter Bosses: +100% (adds a mountain shrine stack without the extra reward to all tp events)
 
 ### Eclipse 2
 
-Teleporter Radius -50%
+Larger Enemies appear more often (golem class enemies are 25% cheaper to spawn)
 
 ### Eclipse 3
 
-Ally Fall Damage +100% and Lethal
+Enemy Attack Speed: +25%
 
 ### Eclipse 4
 
-Enemy Speed +40%
+Enemy Speed +50%
 
 ### Eclipse 5
 
-Ally Healing -50%
+Enemy Elites: +25% (elites are 25% cheaper to spawn)
 
 ### Eclipse 6
 
-Enemy Gold Drops -20%
+
 
 ### Eclipse 7
 
-Enemy Cooldowns -50%
+Enemy Cooldowns -25%
 
 ### Eclipse 8
 
-Allies receive permanent damage
-
-E4, E7, E8 are crucial
-E1, E2, E3, E5 can be replaced
+Allies receive permanent damage (excluding self-damage)
