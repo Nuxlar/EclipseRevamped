@@ -9,7 +9,8 @@ using RoR2;
 using R2API.Utils;
 using MonoMod.RuntimeDetour;
 using System.Reflection;
-using EntityStates.AI.Walker;
+using BepInEx.Configuration;
+using static RoR2.CombatDirector;
 
 namespace EclipseRevamped
 {
@@ -19,10 +20,20 @@ namespace EclipseRevamped
     public const string PluginGUID = PluginAuthor + "." + PluginName;
     public const string PluginAuthor = "Nuxlar";
     public const string PluginName = "EclipseRevamped";
-    public const string PluginVersion = "1.0.0";
+    public const string PluginVersion = "1.1.0";
 
     internal static Main Instance { get; private set; }
     public static string PluginDirectory { get; private set; }
+
+    public static ConfigEntry<bool> shouldChangeE1;
+    public static ConfigEntry<bool> shouldChangeE2;
+    public static ConfigEntry<bool> shouldChangeE3;
+    public static ConfigEntry<bool> shouldChangeE4;
+    public static ConfigEntry<bool> shouldChangeE5;
+    public static ConfigEntry<bool> shouldChangeE6;
+    public static ConfigEntry<bool> shouldChangeE7;
+
+    private static ConfigFile ERConfig { get; set; }
 
     public void Awake()
     {
@@ -32,45 +43,76 @@ namespace EclipseRevamped
 
       Log.Init(Logger);
 
-      ChangeDescriptions();
-      /*
-    ideas
-        E1 Teleporter Bosses +100%
-        E2 
-        E3 Enemy Attack Speed: +25%
-        E4 Enemies +50% faster
-        E5 
-        E6 
-        E7 Enemy Cooldowns -25%
-        E8 Permanent Damage (except self-damage)
-        More elite spawns?
-        TP events more dangerous? mountain shrine but no reward
-        Tier 2 elites appear pre loop
+      ERConfig = new ConfigFile(Paths.ConfigPath + "\\com.Nuxlar.EclipseRevamped.cfg", true);
+      shouldChangeE1 = ERConfig.Bind<bool>("General", "Enable E1 Changes", true, "Rework this Eclipse level");
+      shouldChangeE2 = ERConfig.Bind<bool>("General", "Enable E2 Changes", true, "Rework this Eclipse level");
+      shouldChangeE3 = ERConfig.Bind<bool>("General", "Enable E3 Changes", true, "Rework this Eclipse level");
+      shouldChangeE4 = ERConfig.Bind<bool>("General", "Enable E4 Changes", true, "Tweak this Eclipse level");
+      shouldChangeE5 = ERConfig.Bind<bool>("General", "Enable E5 Changes", true, "Rework this Eclipse level");
+      shouldChangeE6 = ERConfig.Bind<bool>("General", "Enable E6 Changes", true, "Rework this Eclipse level");
+      shouldChangeE7 = ERConfig.Bind<bool>("General", "Enable E7 Changes", true, "Tweak this Eclipse level");
 
-        Vanilla E2
-        E4
-      */
-      IL.RoR2.CharacterMaster.OnBodyStart += RemoveVanillaE1;
-      IL.RoR2.HoldoutZoneController.DoUpdate += RemoveVanillaE2;
-      IL.RoR2.GlobalEventManager.OnCharacterHitGroundServer += RemoveVanillaE3;
-      IL.RoR2.HealthComponent.Heal += RemoveVanillaE5;
-      IL.RoR2.DeathRewards.OnKilledServer += RemoveVanillaE6;
-      IL.RoR2.CharacterBody.RecalculateStats += TweakE4;
-      IL.RoR2.CombatDirector.CalcHighestEliteCostMultiplier += NewE5Hook1;
-      IL.RoR2.CombatDirector.PrepareNewMonsterWave += NewE5Hook3;
-      IL.RoR2.CombatDirector.AttemptSpawnOnTarget += NewE5Hook4;
-      IL.RoR2.CharacterBody.RecalculateStats += TweakE7;
-      // get_selectedDifficulty
-      On.RoR2.TeleporterInteraction.Awake += AddNewE1;
-      MethodInfo target = typeof(DirectorCard).GetPropertyGetter(nameof(DirectorCard.cost));
-      Hook hook = new Hook(target, AddNewE2);
-      MethodInfo target2 = typeof(CombatDirector).GetPropertyGetter(nameof(CombatDirector.lowestEliteCostMultiplier));
-      Hook hook2 = new Hook(target2, NewE5Hook2);
-      RecalculateStatsAPI.GetStatCoefficients += AddNewE3;
+      ChangeDescriptions();
+
+      if (shouldChangeE1.Value)
+      {
+        IL.RoR2.CharacterMaster.OnBodyStart += RemoveVanillaE1;
+        On.RoR2.TeleporterInteraction.Awake += AddNewE1;
+      }
+      if (shouldChangeE2.Value)
+      {
+        IL.RoR2.HoldoutZoneController.DoUpdate += RemoveVanillaE2;
+        MethodInfo target = typeof(DirectorCard).GetPropertyGetter(nameof(DirectorCard.cost));
+        Hook hook = new Hook(target, AddNewE2);
+      }
+      if (shouldChangeE3.Value)
+      {
+        IL.RoR2.GlobalEventManager.OnCharacterHitGroundServer += RemoveVanillaE3;
+        RecalculateStatsAPI.GetStatCoefficients += AddNewE3;
+      }
+      if (shouldChangeE4.Value)
+      {
+        IL.RoR2.CharacterBody.RecalculateStats += TweakE4;
+      }
+      if (shouldChangeE5.Value)
+      {
+        IL.RoR2.HealthComponent.Heal += RemoveVanillaE5;
+        IL.RoR2.CombatDirector.CalcHighestEliteCostMultiplier += NewE5Hook1;
+        MethodInfo target2 = typeof(CombatDirector).GetPropertyGetter(nameof(CombatDirector.lowestEliteCostMultiplier));
+        Hook hook2 = new Hook(target2, NewE5Hook2);
+        IL.RoR2.CombatDirector.PrepareNewMonsterWave += NewE5Hook3;
+        IL.RoR2.CombatDirector.AttemptSpawnOnTarget += NewE5Hook4;
+      }
+      if (shouldChangeE6.Value)
+      {
+        IL.RoR2.DeathRewards.OnKilledServer += RemoveVanillaE6;
+        On.RoR2.CombatDirector.Init += AddNewE6;
+      }
+      if (shouldChangeE7.Value)
+      {
+        IL.RoR2.CharacterBody.RecalculateStats += TweakE7;
+      }
 
       stopwatch.Stop();
       Log.Info_NoCallerPrefix($"Initialized in {stopwatch.Elapsed.TotalSeconds:F2} seconds");
     }
+
+    private void AddNewE6(On.RoR2.CombatDirector.orig_Init orig)
+    {
+      orig();
+
+      EliteTierDef t2Tier = EliteAPI.VanillaEliteTiers[5];
+      t2Tier.isAvailable = (rules) =>
+     {
+       if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5)
+       {
+         return Run.instance && Run.instance.stageClearCount >= 3;
+       }
+       else
+         return Run.instance && Run.instance.loopClearCount > 0 && rules == SpawnCard.EliteRules.Default;
+     };
+    }
+
     private void NewE5Hook4(ILContext il)
     {
       ILCursor c = new ILCursor(il);
@@ -82,7 +124,7 @@ namespace EclipseRevamped
         {
           if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5 && mult != 1)
           {
-            float newMult = mult * 0.75f;
+            float newMult = mult * 0.80f;
             return newMult;
           }
           else return mult;
@@ -93,7 +135,7 @@ namespace EclipseRevamped
         {
           if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5 && mult != 1)
           {
-            float newMult = mult * 0.75f;
+            float newMult = mult * 0.80f;
             return newMult;
           }
           else return mult;
@@ -115,7 +157,7 @@ namespace EclipseRevamped
         {
           if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5)
           {
-            float newMult = mult * 0.75f;
+            float newMult = mult * 0.80f;
             return newMult;
           }
           else return mult;
@@ -129,7 +171,7 @@ namespace EclipseRevamped
     {
       if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5)
       {
-        float newMult = CombatDirector.eliteTiers[1].costMultiplier * 0.75f;
+        float newMult = CombatDirector.eliteTiers[1].costMultiplier * 0.80f;
         return newMult;
       }
       else
@@ -147,7 +189,7 @@ namespace EclipseRevamped
         {
           if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5)
           {
-            float newMult = mult * 0.75f;
+            float newMult = mult * 0.80f;
             return newMult;
           }
           else return mult;
@@ -171,7 +213,7 @@ namespace EclipseRevamped
         SpawnCard spawnCard = self.GetSpawnCard();
         if (spawnCard && spawnCard.hullSize == HullClassification.Golem)
         {
-          int reducedCost = (int)Math.Round(spawnCard.directorCreditCost * 0.75f, 0, MidpointRounding.AwayFromZero);
+          int reducedCost = (int)Math.Round(spawnCard.directorCreditCost * 0.80f, 0, MidpointRounding.AwayFromZero);
           return reducedCost;
         }
         else return spawnCard.directorCreditCost;
@@ -282,13 +324,13 @@ namespace EclipseRevamped
     private void ChangeDescriptions()
     {
       string str1 = "Starts at baseline Monsoon difficulty.\n";
-      string str2 = "\n<mspace=0.5em>(1)</mspace> Teleporter Bosses: <style=cIsHealth>+100%</style></style>";
-      string str3 = "\n<mspace=0.5em>(2)</mspace> Larger Enemies <style=cIsHealth>appear more often</style></style>";
-      string str4 = "\n<mspace=0.5em>(3)</mspace> Enemy Attack Speed: <style=cIsHealth>+25%</style></style>";
-      string str5 = "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+50% Faster</style></style>";
-      string str6 = "\n<mspace=0.5em>(5)</mspace> Enemy Elites: <style=cIsHealth>+25%</style></style>";
-      string str7 = "\n<mspace=0.5em>(6)</mspace> </style></style>";
-      string str8 = "\n<mspace=0.5em>(7)</mspace> Enemy Cooldowns: <style=cIsHealth>-25%</style></style>";
+      string str2 = shouldChangeE1.Value ? "\n<mspace=0.5em>(1)</mspace> Teleporter Bosses: <style=cIsHealth>+100%</style></style>" : "\n<mspace=0.5em>(1)</mspace> Ally Starting Health: <style=cIsHealth>-50%</style></style>";
+      string str3 = shouldChangeE2.Value ? "\n<mspace=0.5em>(2)</mspace> Larger Enemies <style=cIsHealth>appear more often</style></style>" : "\n<mspace=0.5em>(2)</mspace> Teleporter Radius: <style=cIsHealth>-50%</style></style>";
+      string str4 = shouldChangeE3.Value ? "\n<mspace=0.5em>(3)</mspace> Enemy Attack Speed: <style=cIsHealth>+25%</style></style>" : "\n<mspace=0.5em>(3)</mspace> Ally Fall Damage: <style=cIsHealth>+100% and lethal</style></style>";
+      string str5 = shouldChangeE4.Value ? "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+50% Faster</style></style>" : "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+40% Faster</style></style>";
+      string str6 = shouldChangeE5.Value ? "\n<mspace=0.5em>(5)</mspace> Enemy Elites: <style=cIsHealth>+20%</style></style>" : "\n<mspace=0.5em>(5)</mspace> Ally Healing: <style=cIsHealth>-50%</style></style>";
+      string str7 = shouldChangeE6.Value ? "\n<mspace=0.5em>(6)</mspace> Tier 2 Elites <style=cIsHealth>appear earlier</style></style>" : "\n<mspace=0.5em>(6)</mspace> Enemy Gold Drops: <style=cIsHealth>-20%</style></style>";
+      string str8 = shouldChangeE7.Value ? "\n<mspace=0.5em>(7)</mspace> Enemy Cooldowns: <style=cIsHealth>-25%</style></style>" : "\n<mspace=0.5em>(7)</mspace> Enemy Cooldowns: <style=cIsHealth>-50%</style></style>";
       string str9 = "\n<mspace=0.5em>(8)</mspace> Allies recieve <style=cIsHealth>permanent damage</style></style>";
       string str10 = "\"You only celebrate in the light... because I allow it.\" \n\n";
       LanguageAPI.Add("ECLIPSE_1_DESCRIPTION", str1 + str2);

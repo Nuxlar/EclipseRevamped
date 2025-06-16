@@ -41,6 +41,7 @@
     <PackageReference Include="R2API.Core" Version="5.1.5" />
     <PackageReference Include="R2API.Language" Version="1.0.1" />
     <PackageReference Include="R2API.RecalculateStats" Version="1.6.0" />
+    <PackageReference Include="R2API.Elites" Version="1.0.7" />
   </ItemGroup>
 
  <Target Name="BuildTSPackage" AfterTargets="Build">
