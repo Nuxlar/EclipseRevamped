@@ -20,7 +20,7 @@ namespace EclipseRevamped
     public const string PluginGUID = PluginAuthor + "." + PluginName;
     public const string PluginAuthor = "Nuxlar";
     public const string PluginName = "EclipseRevamped";
-    public const string PluginVersion = "1.1.2";
+    public const string PluginVersion = "1.1.3";
 
     internal static Main Instance { get; private set; }
     public static string PluginDirectory { get; private set; }
@@ -78,13 +78,6 @@ namespace EclipseRevamped
       {
         IL.RoR2.HealthComponent.Heal += RemoveVanillaE5;
         On.RoR2.Run.Start += AddNewE5;
-        /*
-        IL.RoR2.CombatDirector.CalcHighestEliteCostMultiplier += NewE5Hook1;
-        MethodInfo target2 = typeof(CombatDirector).GetPropertyGetter(nameof(CombatDirector.lowestEliteCostMultiplier));
-        Hook hook2 = new Hook(target2, NewE5Hook2);
-        IL.RoR2.CombatDirector.PrepareNewMonsterWave += NewE5Hook3;
-        IL.RoR2.CombatDirector.AttemptSpawnOnTarget += NewE5Hook4;
-        */
       }
       if (shouldChangeE6.Value)
       {
@@ -108,8 +101,17 @@ namespace EclipseRevamped
         t1Tier.costMultiplier = 4.5f;
         EliteTierDef t1GildedTier = EliteAPI.VanillaEliteTiers[4];
         t1GildedTier.costMultiplier = 4.5f;
+
         EliteTierDef t2Tier = EliteAPI.VanillaEliteTiers[5];
-        t2Tier.costMultiplier = 13.5f;
+        t2Tier.costMultiplier = 25f;
+        foreach (EliteDef def in t2Tier.eliteTypes)
+        {
+          if (def != null)
+          {
+            def.damageBoostCoefficient = 4f;
+            def.healthBoostCoefficient = 12f;
+          }
+        }
       }
       else
       {
@@ -118,7 +120,15 @@ namespace EclipseRevamped
         EliteTierDef t1GildedTier = EliteAPI.VanillaEliteTiers[4];
         t1GildedTier.costMultiplier = 6f;
         EliteTierDef t2Tier = EliteAPI.VanillaEliteTiers[5];
-        t2Tier.costMultiplier = 18f;
+        t2Tier.costMultiplier = 36f;
+        foreach (EliteDef def in t2Tier.eliteTypes)
+        {
+          if (def != null)
+          {
+            def.damageBoostCoefficient = 6f;
+            def.healthBoostCoefficient = 18f;
+          }
+        }
       }
 
     }
@@ -137,92 +147,6 @@ namespace EclipseRevamped
        else
          return Run.instance && Run.instance.loopClearCount > 0 && rules == SpawnCard.EliteRules.Default;
      };
-    }
-
-    private void NewE5Hook4(ILContext il)
-    {
-      ILCursor c = new ILCursor(il);
-      if (c.TryGotoNext(MoveType.After,
-      x => x.MatchLdfld(typeof(CombatDirector.EliteTierDef), "costMultiplier")
-      ))
-      {
-        c.EmitDelegate<Func<float, float>>((mult) =>
-        {
-          if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5 && mult != 1)
-          {
-            float newMult = mult * 0.80f;
-            return newMult;
-          }
-          else return mult;
-        });
-        if (c.TryGotoNext(MoveType.After, x => x.MatchLdfld(typeof(CombatDirector.EliteTierDef), "costMultiplier")))
-        {
-          c.EmitDelegate<Func<float, float>>((mult) =>
-        {
-          if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5 && mult != 1)
-          {
-            float newMult = mult * 0.80f;
-            return newMult;
-          }
-          else return mult;
-        });
-        }
-      }
-      else
-        Log.Error("EclipseRevamped: Failed to add NewE5Hook4");
-    }
-
-    private void NewE5Hook3(ILContext il)
-    {
-      ILCursor c = new ILCursor(il);
-      if (c.TryGotoNext(MoveType.After,
-      x => x.MatchLdfld(typeof(CombatDirector.EliteTierDef), "costMultiplier")
-      ))
-      {
-        c.EmitDelegate<Func<float, float>>((mult) =>
-        {
-          if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5)
-          {
-            float newMult = mult * 0.80f;
-            return newMult;
-          }
-          else return mult;
-        });
-      }
-      else
-        Log.Error("EclipseRevamped: Failed to add NewE5Hook3");
-    }
-
-    public float NewE5Hook2(Func<float> orig)
-    {
-      if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5)
-      {
-        float newMult = CombatDirector.eliteTiers[1].costMultiplier * 0.80f;
-        return newMult;
-      }
-      else
-        return orig();
-    }
-
-    private void NewE5Hook1(ILContext il)
-    {
-      ILCursor c = new ILCursor(il);
-      if (c.TryGotoNext(MoveType.After,
-      x => x.MatchLdfld(typeof(CombatDirector.EliteTierDef), "costMultiplier")
-      ))
-      {
-        c.EmitDelegate<Func<float, float>>((mult) =>
-        {
-          if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5)
-          {
-            float newMult = mult * 0.80f;
-            return newMult;
-          }
-          else return mult;
-        });
-      }
-      else
-        Log.Error("EclipseRevamped: Failed to add NewE5Hook1");
     }
 
     private void AddNewE3(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)

@@ -1,3 +1,8 @@
+**1.1.3**
+
+- Fixed T2 elites costing way less than they should
+- Reduces HP and DMG of T2 elites to be more reasonable
+
 **1.1.2**
 
 - Fixed the spawns being too excessive
