@@ -4,7 +4,7 @@ Revamps the Eclipse difficulty system. There's a config to enable/disable change
 
 | Level | New | Old |
 | :------ | :------: | :----: |
-| <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/4/42/Eclipse1.png/revision/latest/scale-to-width-down/32?cb=20210325043337" /> E1  |   Teleporter Bosses: +100%   | Ally Starting Health: -50% |
+| <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/4/42/Eclipse1.png/revision/latest/scale-to-width-down/32?cb=20210325043337" /> E1  |   Teleporter Enemies: +50%   | Ally Starting Health: -50% |
 | <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/7/7e/Eclipse2.png/revision/latest/scale-to-width-down/32?cb=20210325043302" /> E2  |   Larger Enemies appear more often   | Teleporter Radius: -50% |
 | <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/1/15/Eclipse3.png/revision/latest/scale-to-width-down/32?cb=20210325043415" /> E3  |  Enemy Attack Speed: +25%   | Ally Fall Damage: +100% and lethal |
 | <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/e/e3/Eclipse4.png/revision/latest/scale-to-width-down/32?cb=20210325034731" /> E4  |  Enemy Speed +50%   | Enemy Speed +40% |
@@ -15,10 +15,9 @@ Revamps the Eclipse difficulty system. There's a config to enable/disable change
 
 ### Info
 
-- The new E1 (TP Bosses +100%) means TP events are basically mountain shrined but without the extra rewards
+- The new E1 (TP Enemies +50%) means TP events have half a mountain shrine with no extra rewards
 - The new E2 (larger enemies) means golem class enemies are 20% cheaper to spawn
-- The new E5 (enemy elies +20%) means elites are 20% cheaper
+- The new E5 (enemy elies +25%) means elites are 25% cheaper
 - The new E6 (T2 elites) means elites will appear Stage 4 onwards
 - The E8 changes can be configured/disabled through CurseCatcher
 
-![e8.png](https://i.postimg.cc/pVCBXtJS/e8.png)

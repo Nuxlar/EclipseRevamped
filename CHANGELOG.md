@@ -1,3 +1,7 @@
+**1.1.4**
+
+- Tweaks the new E1 to boost teleporter credits by 50% instead of the full 100% of a mountain shrine
+
 **1.1.3**
 
 - Fixed T2 elites costing way less than they should

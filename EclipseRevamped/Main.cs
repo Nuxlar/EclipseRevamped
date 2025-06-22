@@ -1,9 +1,7 @@
 using BepInEx;
 using System.Diagnostics;
-using System.IO;
 using R2API;
 using MonoMod.Cil;
-using Mono.Cecil.Cil;
 using System;
 using RoR2;
 using R2API.Utils;
@@ -11,6 +9,8 @@ using MonoMod.RuntimeDetour;
 using System.Reflection;
 using BepInEx.Configuration;
 using static RoR2.CombatDirector;
+using UnityEngine.Networking;
+using UnityEngine;
 
 namespace EclipseRevamped
 {
@@ -20,7 +20,7 @@ namespace EclipseRevamped
     public const string PluginGUID = PluginAuthor + "." + PluginName;
     public const string PluginAuthor = "Nuxlar";
     public const string PluginName = "EclipseRevamped";
-    public const string PluginVersion = "1.1.3";
+    public const string PluginVersion = "1.1.4";
 
     internal static Main Instance { get; private set; }
     public static string PluginDirectory { get; private set; }
@@ -57,7 +57,8 @@ namespace EclipseRevamped
       if (shouldChangeE1.Value)
       {
         IL.RoR2.CharacterMaster.OnBodyStart += RemoveVanillaE1;
-        On.RoR2.TeleporterInteraction.Awake += AddNewE1;
+        IL.RoR2.TeleporterInteraction.ChargingState.OnEnter += NewE1Logic;
+        On.RoR2.TeleporterInteraction.ChargingState.OnEnter += AddNewE1;
       }
       if (shouldChangeE2.Value)
       {
@@ -171,13 +172,33 @@ namespace EclipseRevamped
       else return orig(self);
     }
 
-    private void AddNewE1(On.RoR2.TeleporterInteraction.orig_Awake orig, TeleporterInteraction self)
+    private void NewE1Logic(ILContext il)
+    {
+      ILCursor c = new ILCursor(il);
+      if (c.TryGotoNext(MoveType.After,
+        x => x.MatchCall<TeleporterInteraction.ChargingState>("get_bossDirector")
+      ))
+      {
+        c.EmitDelegate<Func<CombatDirector, CombatDirector>>(useless => null);
+      }
+    }
+
+    private void AddNewE1(On.RoR2.TeleporterInteraction.ChargingState.orig_OnEnter orig, TeleporterInteraction.ChargingState self)
     {
       orig(self);
-      if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse1)
+      if (NetworkServer.active)
       {
-        self.shrineBonusStacks += 1;
-        self.gameObject.transform.GetChild(0).GetChild(7).gameObject.SetActive(true);
+        if ((bool)self.bossDirector)
+        {
+          float creditMultiplier = 0f;
+          if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse1)
+            creditMultiplier = 0.5f;
+
+          self.bossDirector.enabled = true;
+          self.bossDirector.monsterCredit += (float)(600.0 * Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, 0.5f) * (1 + self.teleporterInteraction.shrineBonusStacks + creditMultiplier));
+          self.bossDirector.currentSpawnTarget = self.gameObject;
+          self.bossDirector.SetNextSpawnAsBoss();
+        }
       }
     }
 
@@ -274,7 +295,7 @@ namespace EclipseRevamped
     private void ChangeDescriptions()
     {
       string str1 = "Starts at baseline Monsoon difficulty.\n";
-      string str2 = shouldChangeE1.Value ? "\n<mspace=0.5em>(1)</mspace> Teleporter Bosses: <style=cIsHealth>+100%</style></style>" : "\n<mspace=0.5em>(1)</mspace> Ally Starting Health: <style=cIsHealth>-50%</style></style>";
+      string str2 = shouldChangeE1.Value ? "\n<mspace=0.5em>(1)</mspace> Teleporter Enemies: <style=cIsHealth>+50%</style></style>" : "\n<mspace=0.5em>(1)</mspace> Ally Starting Health: <style=cIsHealth>-50%</style></style>";
       string str3 = shouldChangeE2.Value ? "\n<mspace=0.5em>(2)</mspace> Larger Enemies <style=cIsHealth>appear more often</style></style>" : "\n<mspace=0.5em>(2)</mspace> Teleporter Radius: <style=cIsHealth>-50%</style></style>";
       string str4 = shouldChangeE3.Value ? "\n<mspace=0.5em>(3)</mspace> Enemy Attack Speed: <style=cIsHealth>+25%</style></style>" : "\n<mspace=0.5em>(3)</mspace> Ally Fall Damage: <style=cIsHealth>+100% and lethal</style></style>";
       string str5 = shouldChangeE4.Value ? "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+50% Faster</style></style>" : "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+40% Faster</style></style>";
