@@ -20,7 +20,7 @@ namespace EclipseRevamped
     public const string PluginGUID = PluginAuthor + "." + PluginName;
     public const string PluginAuthor = "Nuxlar";
     public const string PluginName = "EclipseRevamped";
-    public const string PluginVersion = "1.1.4";
+    public const string PluginVersion = "1.1.5";
 
     internal static Main Instance { get; private set; }
     public static string PluginDirectory { get; private set; }
@@ -63,8 +63,7 @@ namespace EclipseRevamped
       if (shouldChangeE2.Value)
       {
         IL.RoR2.HoldoutZoneController.DoUpdate += RemoveVanillaE2;
-        MethodInfo target = typeof(DirectorCard).GetPropertyGetter(nameof(DirectorCard.cost));
-        Hook hook = new Hook(target, AddNewE2);
+        RoR2Application.onLoad += AddNewE2;
       }
       if (shouldChangeE3.Value)
       {
@@ -83,7 +82,8 @@ namespace EclipseRevamped
       if (shouldChangeE6.Value)
       {
         IL.RoR2.DeathRewards.OnKilledServer += RemoveVanillaE6;
-        On.RoR2.CombatDirector.Init += AddNewE6;
+        MethodInfo target = typeof(DirectorCard).GetPropertyGetter(nameof(DirectorCard.cost));
+        Hook hook = new Hook(target, AddNewE6);
       }
       if (shouldChangeE7.Value)
       {
@@ -93,26 +93,27 @@ namespace EclipseRevamped
       stopwatch.Stop();
       Log.Info_NoCallerPrefix($"Initialized in {stopwatch.Elapsed.TotalSeconds:F2} seconds");
     }
+
+    private void AddNewE2()
+    {
+      for (int i = 0; i < DifficultyCatalog.difficultyDefs.Length; i++)
+      {
+        DifficultyDef def = DifficultyCatalog.difficultyDefs[i];
+        if (def.nameToken.Contains("ECLIPSE") && !def.nameToken.Contains("1"))
+          def.scalingValue = 3.5f;
+        // ECLIPSE_2_NAME
+      }
+    }
+
     private void AddNewE5(On.RoR2.Run.orig_Start orig, Run self)
     {
       orig(self);
       if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5)
       {
         EliteTierDef t1Tier = EliteAPI.VanillaEliteTiers[1];
-        t1Tier.costMultiplier = 4.5f;
+        t1Tier.costMultiplier = 4.8f;
         EliteTierDef t1GildedTier = EliteAPI.VanillaEliteTiers[4];
-        t1GildedTier.costMultiplier = 4.5f;
-
-        EliteTierDef t2Tier = EliteAPI.VanillaEliteTiers[5];
-        t2Tier.costMultiplier = 25f;
-        foreach (EliteDef def in t2Tier.eliteTypes)
-        {
-          if (def != null)
-          {
-            def.damageBoostCoefficient = 4f;
-            def.healthBoostCoefficient = 12f;
-          }
-        }
+        t1GildedTier.costMultiplier = 4.8f;
       }
       else
       {
@@ -120,34 +121,8 @@ namespace EclipseRevamped
         t1Tier.costMultiplier = 6f;
         EliteTierDef t1GildedTier = EliteAPI.VanillaEliteTiers[4];
         t1GildedTier.costMultiplier = 6f;
-        EliteTierDef t2Tier = EliteAPI.VanillaEliteTiers[5];
-        t2Tier.costMultiplier = 36f;
-        foreach (EliteDef def in t2Tier.eliteTypes)
-        {
-          if (def != null)
-          {
-            def.damageBoostCoefficient = 6f;
-            def.healthBoostCoefficient = 18f;
-          }
-        }
       }
 
-    }
-
-    private void AddNewE6(On.RoR2.CombatDirector.orig_Init orig)
-    {
-      orig();
-
-      EliteTierDef t2Tier = EliteAPI.VanillaEliteTiers[5];
-      t2Tier.isAvailable = (rules) =>
-     {
-       if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5)
-       {
-         return Run.instance && Run.instance.stageClearCount >= 3;
-       }
-       else
-         return Run.instance && Run.instance.loopClearCount > 0 && rules == SpawnCard.EliteRules.Default;
-     };
     }
 
     private void AddNewE3(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
@@ -157,7 +132,7 @@ namespace EclipseRevamped
       args.attackSpeedMultAdd += 0.25f;
     }
 
-    public int AddNewE2(Func<DirectorCard, int> orig, DirectorCard self)
+    public int AddNewE6(Func<DirectorCard, int> orig, DirectorCard self)
     {
       if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse2)
       {
@@ -296,11 +271,11 @@ namespace EclipseRevamped
     {
       string str1 = "Starts at baseline Monsoon difficulty.\n";
       string str2 = shouldChangeE1.Value ? "\n<mspace=0.5em>(1)</mspace> Teleporter Enemies: <style=cIsHealth>+50%</style></style>" : "\n<mspace=0.5em>(1)</mspace> Ally Starting Health: <style=cIsHealth>-50%</style></style>";
-      string str3 = shouldChangeE2.Value ? "\n<mspace=0.5em>(2)</mspace> Larger Enemies <style=cIsHealth>appear more often</style></style>" : "\n<mspace=0.5em>(2)</mspace> Teleporter Radius: <style=cIsHealth>-50%</style></style>";
+      string str3 = shouldChangeE2.Value ? "\n<mspace=0.5em>(2)</mspace> Difficulty Scaling <style=cIsHealth>+25%</style></style>" : "\n<mspace=0.5em>(2)</mspace> Teleporter Radius: <style=cIsHealth>-50%</style></style>";
       string str4 = shouldChangeE3.Value ? "\n<mspace=0.5em>(3)</mspace> Enemy Attack Speed: <style=cIsHealth>+25%</style></style>" : "\n<mspace=0.5em>(3)</mspace> Ally Fall Damage: <style=cIsHealth>+100% and lethal</style></style>";
       string str5 = shouldChangeE4.Value ? "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+50% Faster</style></style>" : "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+40% Faster</style></style>";
-      string str6 = shouldChangeE5.Value ? "\n<mspace=0.5em>(5)</mspace> Enemy Elites: <style=cIsHealth>+25%</style></style>" : "\n<mspace=0.5em>(5)</mspace> Ally Healing: <style=cIsHealth>-50%</style></style>";
-      string str7 = shouldChangeE6.Value ? "\n<mspace=0.5em>(6)</mspace> Tier 2 Elites <style=cIsHealth>appear earlier</style></style>" : "\n<mspace=0.5em>(6)</mspace> Enemy Gold Drops: <style=cIsHealth>-20%</style></style>";
+      string str6 = shouldChangeE5.Value ? "\n<mspace=0.5em>(5)</mspace> Enemy Elites: <style=cIsHealth>+20%</style></style>" : "\n<mspace=0.5em>(5)</mspace> Ally Healing: <style=cIsHealth>-50%</style></style>";
+      string str7 = shouldChangeE6.Value ? "\n<mspace=0.5em>(6)</mspace> Larger Enemies <style=cIsHealth>appear more often</style></style>" : "\n<mspace=0.5em>(6)</mspace> Enemy Gold Drops: <style=cIsHealth>-20%</style></style>";
       string str8 = shouldChangeE7.Value ? "\n<mspace=0.5em>(7)</mspace> Enemy Cooldowns: <style=cIsHealth>-25%</style></style>" : "\n<mspace=0.5em>(7)</mspace> Enemy Cooldowns: <style=cIsHealth>-50%</style></style>";
       string str9 = "\n<mspace=0.5em>(8)</mspace> Allies recieve <style=cIsHealth>permanent damage</style></style>";
       string str10 = "\"You only celebrate in the light... because I allow it.\" \n\n";

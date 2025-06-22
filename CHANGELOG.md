@@ -1,3 +1,10 @@
+**1.1.5**
+
+- Replaces new E6 (Tier 2 elites -> Larger enemies)
+- Replaces new E2 (Larger enemies -> +25% difficulty scaling)
+- Reduces new E5 (Increased elites +25% -> 20%)
+- Note: with the faster runs, I increased scaling instead of the T2 elites since they weren't as impactful
+
 **1.1.4**
 
 - Tweaks the new E1 to boost teleporter credits by 50% instead of the full 100% of a mountain shrine
