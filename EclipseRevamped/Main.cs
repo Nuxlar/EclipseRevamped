@@ -20,7 +20,7 @@ namespace EclipseRevamped
     public const string PluginGUID = PluginAuthor + "." + PluginName;
     public const string PluginAuthor = "Nuxlar";
     public const string PluginName = "EclipseRevamped";
-    public const string PluginVersion = "1.1.5";
+    public const string PluginVersion = "1.1.6";
 
     internal static Main Instance { get; private set; }
     public static string PluginDirectory { get; private set; }
@@ -100,7 +100,7 @@ namespace EclipseRevamped
       {
         DifficultyDef def = DifficultyCatalog.difficultyDefs[i];
         if (def.nameToken.Contains("ECLIPSE") && !def.nameToken.Contains("1"))
-          def.scalingValue = 3.5f;
+          def.scalingValue = 3.4f;
         // ECLIPSE_2_NAME
       }
     }
@@ -134,7 +134,7 @@ namespace EclipseRevamped
 
     public int AddNewE6(Func<DirectorCard, int> orig, DirectorCard self)
     {
-      if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse2)
+      if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse6)
       {
         SpawnCard spawnCard = self.GetSpawnCard();
         if (spawnCard && spawnCard.hullSize == HullClassification.Golem)
@@ -271,7 +271,7 @@ namespace EclipseRevamped
     {
       string str1 = "Starts at baseline Monsoon difficulty.\n";
       string str2 = shouldChangeE1.Value ? "\n<mspace=0.5em>(1)</mspace> Teleporter Enemies: <style=cIsHealth>+50%</style></style>" : "\n<mspace=0.5em>(1)</mspace> Ally Starting Health: <style=cIsHealth>-50%</style></style>";
-      string str3 = shouldChangeE2.Value ? "\n<mspace=0.5em>(2)</mspace> Difficulty Scaling <style=cIsHealth>+25%</style></style>" : "\n<mspace=0.5em>(2)</mspace> Teleporter Radius: <style=cIsHealth>-50%</style></style>";
+      string str3 = shouldChangeE2.Value ? "\n<mspace=0.5em>(2)</mspace> Difficulty Scaling <style=cIsHealth>+20%</style></style>" : "\n<mspace=0.5em>(2)</mspace> Teleporter Radius: <style=cIsHealth>-50%</style></style>";
       string str4 = shouldChangeE3.Value ? "\n<mspace=0.5em>(3)</mspace> Enemy Attack Speed: <style=cIsHealth>+25%</style></style>" : "\n<mspace=0.5em>(3)</mspace> Ally Fall Damage: <style=cIsHealth>+100% and lethal</style></style>";
       string str5 = shouldChangeE4.Value ? "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+50% Faster</style></style>" : "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+40% Faster</style></style>";
       string str6 = shouldChangeE5.Value ? "\n<mspace=0.5em>(5)</mspace> Enemy Elites: <style=cIsHealth>+20%</style></style>" : "\n<mspace=0.5em>(5)</mspace> Ally Healing: <style=cIsHealth>-50%</style></style>";

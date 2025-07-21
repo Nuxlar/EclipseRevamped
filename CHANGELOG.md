@@ -1,3 +1,9 @@
+**1.1.6**
+
+- Adds EnemyAttackSpeedFixes as a dependency
+- Reduces scaling increase from 25% to 20%
+- Fixes new Eclipse 6 applying on E2 and above
+
 **1.1.5**
 
 - Replaces new E6 (Tier 2 elites -> Larger enemies)
