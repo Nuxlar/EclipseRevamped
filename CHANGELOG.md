@@ -1,3 +1,8 @@
+**1.1.7**
+
+- Reduces E6 larger enemy cost (-20% -> -15%)
+- Increases E2 scaling from 20% to 25%
+
 **1.1.6**
 
 - Adds EnemyAttackSpeedFixes as a dependency

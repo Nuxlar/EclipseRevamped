@@ -20,7 +20,7 @@ namespace EclipseRevamped
     public const string PluginGUID = PluginAuthor + "." + PluginName;
     public const string PluginAuthor = "Nuxlar";
     public const string PluginName = "EclipseRevamped";
-    public const string PluginVersion = "1.1.6";
+    public const string PluginVersion = "1.1.7";
 
     internal static Main Instance { get; private set; }
     public static string PluginDirectory { get; private set; }
@@ -100,7 +100,7 @@ namespace EclipseRevamped
       {
         DifficultyDef def = DifficultyCatalog.difficultyDefs[i];
         if (def.nameToken.Contains("ECLIPSE") && !def.nameToken.Contains("1"))
-          def.scalingValue = 3.4f;
+          def.scalingValue = 3.5f;
         // ECLIPSE_2_NAME
       }
     }
@@ -139,7 +139,7 @@ namespace EclipseRevamped
         SpawnCard spawnCard = self.GetSpawnCard();
         if (spawnCard && spawnCard.hullSize == HullClassification.Golem)
         {
-          int reducedCost = (int)Math.Round(spawnCard.directorCreditCost * 0.80f, 0, MidpointRounding.AwayFromZero);
+          int reducedCost = (int)Math.Round(spawnCard.directorCreditCost * 0.85f, 0, MidpointRounding.AwayFromZero);
           return reducedCost;
         }
         else return spawnCard.directorCreditCost;
