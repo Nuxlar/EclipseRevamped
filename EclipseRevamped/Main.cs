@@ -20,7 +20,7 @@ namespace EclipseRevamped
     public const string PluginGUID = PluginAuthor + "." + PluginName;
     public const string PluginAuthor = "Nuxlar";
     public const string PluginName = "EclipseRevamped";
-    public const string PluginVersion = "1.1.7";
+    public const string PluginVersion = "1.2.0";
 
     internal static Main Instance { get; private set; }
     public static string PluginDirectory { get; private set; }
@@ -31,7 +31,6 @@ namespace EclipseRevamped
     public static ConfigEntry<bool> shouldChangeE4;
     public static ConfigEntry<bool> shouldChangeE5;
     public static ConfigEntry<bool> shouldChangeE6;
-    public static ConfigEntry<bool> shouldChangeE7;
 
     private static ConfigFile ERConfig { get; set; }
 
@@ -50,7 +49,6 @@ namespace EclipseRevamped
       shouldChangeE4 = ERConfig.Bind<bool>("General", "Enable E4 Changes", true, "Tweak this Eclipse level");
       shouldChangeE5 = ERConfig.Bind<bool>("General", "Enable E5 Changes", true, "Rework this Eclipse level");
       shouldChangeE6 = ERConfig.Bind<bool>("General", "Enable E6 Changes", true, "Rework this Eclipse level");
-      shouldChangeE7 = ERConfig.Bind<bool>("General", "Enable E7 Changes", true, "Tweak this Eclipse level");
 
       ChangeDescriptions();
 
@@ -84,10 +82,6 @@ namespace EclipseRevamped
         IL.RoR2.DeathRewards.OnKilledServer += RemoveVanillaE6;
         MethodInfo target = typeof(DirectorCard).GetPropertyGetter(nameof(DirectorCard.cost));
         Hook hook = new Hook(target, AddNewE6);
-      }
-      if (shouldChangeE7.Value)
-      {
-        IL.RoR2.CharacterBody.RecalculateStats += TweakE7;
       }
 
       stopwatch.Stop();
@@ -177,24 +171,6 @@ namespace EclipseRevamped
       }
     }
 
-    private void TweakE7(ILContext il)
-    {
-      ILCursor c = new ILCursor(il);
-      if (c.TryGotoNext(MoveType.After,
-      x => x.MatchCallvirt(typeof(Run), "get_selectedDifficulty"),
-      x => x.MatchLdcI4(9)
-      ))
-      {
-        if (c.TryGotoNext(MoveType.Before,
-        x => x.MatchLdcR4(0.5f)))
-        {
-          c.Next.Operand = 0.75f;
-        }
-      }
-      else
-        Log.Error("EclipseRevamped: Failed to tweak vanilla E7");
-    }
-
     private void TweakE4(ILContext il)
     {
       ILCursor c = new ILCursor(il);
@@ -276,7 +252,7 @@ namespace EclipseRevamped
       string str5 = shouldChangeE4.Value ? "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+50% Faster</style></style>" : "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+40% Faster</style></style>";
       string str6 = shouldChangeE5.Value ? "\n<mspace=0.5em>(5)</mspace> Enemy Elites: <style=cIsHealth>+20%</style></style>" : "\n<mspace=0.5em>(5)</mspace> Ally Healing: <style=cIsHealth>-50%</style></style>";
       string str7 = shouldChangeE6.Value ? "\n<mspace=0.5em>(6)</mspace> Larger Enemies <style=cIsHealth>appear more often</style></style>" : "\n<mspace=0.5em>(6)</mspace> Enemy Gold Drops: <style=cIsHealth>-20%</style></style>";
-      string str8 = shouldChangeE7.Value ? "\n<mspace=0.5em>(7)</mspace> Enemy Cooldowns: <style=cIsHealth>-25%</style></style>" : "\n<mspace=0.5em>(7)</mspace> Enemy Cooldowns: <style=cIsHealth>-50%</style></style>";
+      string str8 = "\n<mspace=0.5em>(7)</mspace> Enemy Cooldowns: <style=cIsHealth>-50%</style></style>";
       string str9 = "\n<mspace=0.5em>(8)</mspace> Allies recieve <style=cIsHealth>permanent damage</style></style>";
       string str10 = "\"You only celebrate in the light... because I allow it.\" \n\n";
       LanguageAPI.Add("ECLIPSE_1_DESCRIPTION", str1 + str2);

@@ -10,7 +10,7 @@ Revamps the Eclipse difficulty system. There's a config to enable/disable change
 | <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/e/e3/Eclipse4.png/revision/latest/scale-to-width-down/32?cb=20210325034731" /> E4  |  Enemy Speed +50%   | Enemy Speed +40% |
 | <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/3/34/Eclipse5.png/revision/latest/scale-to-width-down/32?cb=20210325034812" /> E5  |  Enemy Elites: +20%   | Ally Healing: -50% |
 | <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/3/30/Eclipse6.png/revision/latest/scale-to-width-down/32?cb=20210325043505" /> E6  |  Larger Enemies appear more often (-15% spawn cost)   | Enemy Gold Drops: -20% |
-| <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/b/b5/Eclipse7.png/revision/latest/scale-to-width-down/32?cb=20210325043524" /> E7  |  Enemy Cooldowns -25%   | Enemy Cooldowns -50% |
+| <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/b/b5/Eclipse7.png/revision/latest/scale-to-width-down/32?cb=20210325043524" /> E7  |  Unchanged   | Enemy Cooldowns -50% |
 | <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/f/fa/Eclipse8.png/revision/latest/scale-to-width-down/32?cb=20210325043543" /> E8  |  Allies receive permanent damage (non-self inflicted)   | Allies receive permanent damage |
 
 ### Info

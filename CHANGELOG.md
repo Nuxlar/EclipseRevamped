@@ -1,3 +1,7 @@
+**1.2.0**
+
+- Removes E7 tweak (back to -50% cooldowns)
+
 **1.1.7**
 
 - Reduces E6 larger enemy cost (-20% -> -15%)
