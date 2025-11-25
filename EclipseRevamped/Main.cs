@@ -4,9 +4,6 @@ using R2API;
 using MonoMod.Cil;
 using System;
 using RoR2;
-using R2API.Utils;
-using MonoMod.RuntimeDetour;
-using System.Reflection;
 using BepInEx.Configuration;
 using static RoR2.CombatDirector;
 using UnityEngine.Networking;
@@ -20,7 +17,7 @@ namespace EclipseRevamped
     public const string PluginGUID = PluginAuthor + "." + PluginName;
     public const string PluginAuthor = "Nuxlar";
     public const string PluginName = "EclipseRevamped";
-    public const string PluginVersion = "1.2.0";
+    public const string PluginVersion = "1.3.0";
 
     internal static Main Instance { get; private set; }
     public static string PluginDirectory { get; private set; }
@@ -46,7 +43,6 @@ namespace EclipseRevamped
       shouldChangeE1 = ERConfig.Bind<bool>("General", "Enable E1 Changes", true, "Rework this Eclipse level");
       shouldChangeE2 = ERConfig.Bind<bool>("General", "Enable E2 Changes", true, "Rework this Eclipse level");
       shouldChangeE3 = ERConfig.Bind<bool>("General", "Enable E3 Changes", true, "Rework this Eclipse level");
-      shouldChangeE4 = ERConfig.Bind<bool>("General", "Enable E4 Changes", true, "Tweak this Eclipse level");
       shouldChangeE5 = ERConfig.Bind<bool>("General", "Enable E5 Changes", true, "Rework this Eclipse level");
       shouldChangeE6 = ERConfig.Bind<bool>("General", "Enable E6 Changes", true, "Rework this Eclipse level");
 
@@ -66,22 +62,16 @@ namespace EclipseRevamped
       if (shouldChangeE3.Value)
       {
         IL.RoR2.GlobalEventManager.OnCharacterHitGroundServer += RemoveVanillaE3;
-        RecalculateStatsAPI.GetStatCoefficients += AddNewE3;
-      }
-      if (shouldChangeE4.Value)
-      {
-        IL.RoR2.CharacterBody.RecalculateStats += TweakE4;
+        On.RoR2.Run.Start += AddNewE3;
       }
       if (shouldChangeE5.Value)
       {
-        IL.RoR2.HealthComponent.Heal += RemoveVanillaE5;
-        On.RoR2.Run.Start += AddNewE5;
+        IL.RoR2.HealthComponent.Heal += TweakVanillaE5;
       }
       if (shouldChangeE6.Value)
       {
         IL.RoR2.DeathRewards.OnKilledServer += RemoveVanillaE6;
-        MethodInfo target = typeof(DirectorCard).GetPropertyGetter(nameof(DirectorCard.cost));
-        Hook hook = new Hook(target, AddNewE6);
+        On.RoR2.CharacterMaster.OnBodyStart += AddNewE6;
       }
 
       stopwatch.Stop();
@@ -99,15 +89,15 @@ namespace EclipseRevamped
       }
     }
 
-    private void AddNewE5(On.RoR2.Run.orig_Start orig, Run self)
+    private void AddNewE3(On.RoR2.Run.orig_Start orig, Run self)
     {
       orig(self);
       if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse5)
       {
         EliteTierDef t1Tier = EliteAPI.VanillaEliteTiers[1];
-        t1Tier.costMultiplier = 4.8f;
+        t1Tier.costMultiplier = 4.5f;
         EliteTierDef t1GildedTier = EliteAPI.VanillaEliteTiers[4];
-        t1GildedTier.costMultiplier = 4.8f;
+        t1GildedTier.costMultiplier = 4.5f;
       }
       else
       {
@@ -117,28 +107,6 @@ namespace EclipseRevamped
         t1GildedTier.costMultiplier = 6f;
       }
 
-    }
-
-    private void AddNewE3(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
-    {
-      if (!(bool)Run.instance || Run.instance.selectedDifficulty < DifficultyIndex.Eclipse3 || !(bool)sender || !(bool)sender.teamComponent || sender.teamComponent.teamIndex == TeamIndex.Player)
-        return;
-      args.attackSpeedMultAdd += 0.25f;
-    }
-
-    public int AddNewE6(Func<DirectorCard, int> orig, DirectorCard self)
-    {
-      if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse6)
-      {
-        SpawnCard spawnCard = self.GetSpawnCard();
-        if (spawnCard && spawnCard.hullSize == HullClassification.Golem)
-        {
-          int reducedCost = (int)Math.Round(spawnCard.directorCreditCost * 0.85f, 0, MidpointRounding.AwayFromZero);
-          return reducedCost;
-        }
-        else return spawnCard.directorCreditCost;
-      }
-      else return orig(self);
     }
 
     private void NewE1Logic(ILContext il)
@@ -169,20 +137,6 @@ namespace EclipseRevamped
           self.bossDirector.SetNextSpawnAsBoss();
         }
       }
-    }
-
-    private void TweakE4(ILContext il)
-    {
-      ILCursor c = new ILCursor(il);
-      if (c.TryGotoNext(MoveType.Before,
-      x => x.MatchCallvirt(typeof(Run), "get_selectedDifficulty")
-      ))
-      {
-        c.GotoNext(MoveType.Before, x => x.MatchLdcR4(0.4f));
-        c.Next.Operand = 0.5f;
-      }
-      else
-        Log.Error("EclipseRevamped: Failed to tweak vanilla E4");
     }
 
     private void RemoveVanillaE1(ILContext il)
@@ -220,14 +174,14 @@ namespace EclipseRevamped
         Log.Error("EclipseRevamped: Failed to remove vanilla E3");
     }
 
-    private void RemoveVanillaE5(ILContext il)
+    private void TweakVanillaE5(ILContext il)
     {
       ILCursor c = new ILCursor(il);
       if (c.TryGotoNext(MoveType.Before,
       x => x.MatchLdcR4(2f),
       x => x.MatchDiv()
       ))
-        c.Next.Operand = 1f;
+        c.Next.Operand = 1.33f;
       else
         Log.Error("EclipseRevamped: Failed to tweak vanilla E5");
     }
@@ -243,15 +197,27 @@ namespace EclipseRevamped
         Log.Error("EclipseRevamped: Failed to remove vanilla E6");
     }
 
+    private void AddNewE6(On.RoR2.CharacterMaster.orig_OnBodyStart orig, CharacterMaster self, CharacterBody body)
+    {
+      orig(self, body);
+      if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse6)
+      {
+        if (body.teamComponent && body.inventory && (body.teamComponent.teamIndex == TeamIndex.Monster || body.teamComponent.teamIndex == TeamIndex.Void))
+        {
+          body.inventory.GiveItemPermanent(DLC1Content.Items.PermanentDebuffOnHit, 1);
+        }
+      }
+    }
+
     private void ChangeDescriptions()
     {
       string str1 = "Starts at baseline Monsoon difficulty.\n";
       string str2 = shouldChangeE1.Value ? "\n<mspace=0.5em>(1)</mspace> Teleporter Enemies: <style=cIsHealth>+50%</style></style>" : "\n<mspace=0.5em>(1)</mspace> Ally Starting Health: <style=cIsHealth>-50%</style></style>";
       string str3 = shouldChangeE2.Value ? "\n<mspace=0.5em>(2)</mspace> Difficulty Scaling <style=cIsHealth>+20%</style></style>" : "\n<mspace=0.5em>(2)</mspace> Teleporter Radius: <style=cIsHealth>-50%</style></style>";
-      string str4 = shouldChangeE3.Value ? "\n<mspace=0.5em>(3)</mspace> Enemy Attack Speed: <style=cIsHealth>+25%</style></style>" : "\n<mspace=0.5em>(3)</mspace> Ally Fall Damage: <style=cIsHealth>+100% and lethal</style></style>";
-      string str5 = shouldChangeE4.Value ? "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+50% Faster</style></style>" : "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+40% Faster</style></style>";
-      string str6 = shouldChangeE5.Value ? "\n<mspace=0.5em>(5)</mspace> Enemy Elites: <style=cIsHealth>+20%</style></style>" : "\n<mspace=0.5em>(5)</mspace> Ally Healing: <style=cIsHealth>-50%</style></style>";
-      string str7 = shouldChangeE6.Value ? "\n<mspace=0.5em>(6)</mspace> Larger Enemies <style=cIsHealth>appear more often</style></style>" : "\n<mspace=0.5em>(6)</mspace> Enemy Gold Drops: <style=cIsHealth>-20%</style></style>";
+      string str4 = shouldChangeE3.Value ? "\n<mspace=0.5em>(5)</mspace> Enemy Elites: <style=cIsHealth>+25%</style></style>" : "\n<mspace=0.5em>(3)</mspace> Ally Fall Damage: <style=cIsHealth>+100% and lethal</style></style>";
+      string str5 = "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+40% Faster</style></style>";
+      string str6 = shouldChangeE5.Value ? "\n<mspace=0.5em>(5)</mspace> Ally Healing: <style=cIsHealth>-25%</style></style>" : "\n<mspace=0.5em>(5)</mspace> Ally Healing: <style=cIsHealth>-50%</style></style>";
+      string str7 = shouldChangeE6.Value ? "\n<mspace=0.5em>(6)</mspace> Enemy attacks <style=cIsHealth>permanently reduce armor</style></style>" : "\n<mspace=0.5em>(6)</mspace> Enemy Gold Drops: <style=cIsHealth>-20%</style></style>";
       string str8 = "\n<mspace=0.5em>(7)</mspace> Enemy Cooldowns: <style=cIsHealth>-50%</style></style>";
       string str9 = "\n<mspace=0.5em>(8)</mspace> Allies recieve <style=cIsHealth>permanent damage</style></style>";
       string str10 = "\"You only celebrate in the light... because I allow it.\" \n\n";

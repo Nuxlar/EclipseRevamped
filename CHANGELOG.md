@@ -1,3 +1,10 @@
+**1.3.0**
+
+- Updated for Alloyed Collective
+- Removed E4 tweak `back to +40% move speed`
+- Increased new E5 and moved to E3 `20% elite spawns -> 25% elite spawns`
+- Changed new E6 `Larger Enemies appear more often (-15% spawn cost) -> Enemy attacks permanently reduce your armor`
+
 **1.2.0**
 
 - Removes E7 tweak (back to -50% cooldowns)
