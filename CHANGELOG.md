@@ -1,3 +1,9 @@
+**1.3.1**
+
+- Fixes new E1 preventing amalgamators spawning on stage 3
+- Cheapens elite cost back down `25% -> 20%`
+- Fixes in-game Eclipse text not matching actual values
+
 **1.3.0**
 
 - Updated for Alloyed Collective
