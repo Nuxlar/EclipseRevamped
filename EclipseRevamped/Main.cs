@@ -8,6 +8,7 @@ using BepInEx.Configuration;
 using static RoR2.CombatDirector;
 using UnityEngine.Networking;
 using UnityEngine;
+using Mono.Cecil.Cil;
 
 namespace EclipseRevamped
 {
@@ -17,7 +18,7 @@ namespace EclipseRevamped
     public const string PluginGUID = PluginAuthor + "." + PluginName;
     public const string PluginAuthor = "Nuxlar";
     public const string PluginName = "EclipseRevamped";
-    public const string PluginVersion = "1.3.1";
+    public const string PluginVersion = "1.3.2";
 
     internal static Main Instance { get; private set; }
     public static string PluginDirectory { get; private set; }
@@ -51,7 +52,7 @@ namespace EclipseRevamped
       if (shouldChangeE1.Value)
       {
         IL.RoR2.CharacterMaster.OnBodyStart += RemoveVanillaE1;
-        On.RoR2.TeleporterInteraction.ChargingState.OnEnter += AddNewE1;
+        IL.RoR2.TeleporterInteraction.ChargingState.OnEnter += AddNewE1;
       }
       if (shouldChangeE2.Value)
       {
@@ -107,23 +108,19 @@ namespace EclipseRevamped
       }
 
     }
-
-    private void AddNewE1(On.RoR2.TeleporterInteraction.ChargingState.orig_OnEnter orig, TeleporterInteraction.ChargingState self)
+    private void AddNewE1(ILContext il)
     {
-      orig(self);
-      if (NetworkServer.active)
+      ILCursor c = new ILCursor(il);
+      if (c.TryGotoNext(MoveType.After,
+        x => x.MatchCallOrCallvirt<TeleporterInteraction>("get_shrineBonusStacks"),
+        x => x.MatchAdd(),
+        x => x.MatchConvR4()
+      ))
       {
-        if ((bool)self.bossDirector)
+        c.EmitDelegate<Func<float, float>>((stacks) =>
         {
-          float creditMultiplier = 0f;
-          if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse1)
-            creditMultiplier = 0.5f;
-
-          self.bossDirector.enabled = true;
-          self.bossDirector.monsterCredit += (float)(600.0 * Mathf.Pow(Run.instance.compensatedDifficultyCoefficient, 0.5f) * (1 + self.teleporterInteraction.shrineBonusStacks + creditMultiplier));
-          self.bossDirector.currentSpawnTarget = self.gameObject;
-          self.bossDirector.SetNextSpawnAsBoss();
-        }
+          return stacks + 0.5f;
+        });
       }
     }
 

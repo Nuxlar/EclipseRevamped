@@ -1,3 +1,7 @@
+**1.3.2**
+
+- Fixes new E1 applying twice, doubling the credits for the tp event
+
 **1.3.1**
 
 - Fixes new E1 preventing amalgamators spawning on stage 3
