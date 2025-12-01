@@ -9,13 +9,12 @@ Revamps the Eclipse difficulty system. There's a config to enable/disable change
 | <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/1/15/Eclipse3.png/revision/latest/scale-to-width-down/32?cb=20210325043415" /> E3  |  Enemy Elites: +20%   | Ally Fall Damage: +100% and lethal |
 | <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/e/e3/Eclipse4.png/revision/latest/scale-to-width-down/32?cb=20210325034731" /> E4  |  Unchanged   | Enemy Speed +40% |
 | <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/3/34/Eclipse5.png/revision/latest/scale-to-width-down/32?cb=20210325034812" /> E5  |  Ally Healing: -25%   | Ally Healing: -50% |
-| <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/3/30/Eclipse6.png/revision/latest/scale-to-width-down/32?cb=20210325043505" /> E6  |  Enemy attacks permanently reduce armor   | Enemy Gold Drops: -20% |
+| <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/3/30/Eclipse6.png/revision/latest/scale-to-width-down/32?cb=20210325043505" /> E6  |  Removed (configurable)   | Enemy Gold Drops: -20% |
 | <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/b/b5/Eclipse7.png/revision/latest/scale-to-width-down/32?cb=20210325043524" /> E7  |  Unchanged   | Enemy Cooldowns -50% |
 | <img src="https://static.wikia.nocookie.net/riskofrain2_gamepedia_en/images/f/fa/Eclipse8.png/revision/latest/scale-to-width-down/32?cb=20210325043543" /> E8  |  Allies receive permanent damage (non-self inflicted)   | Allies receive permanent damage |
 
 ### Info
 
 - The new E1 (TP Enemies +50%) means TP events have half a mountain shrine with no extra rewards
-- The new E6 (armor reduction) means enemies apply a stack of scorpion's debuff per hit (-2 armor)
 - The E8 changes can be configured/disabled through CurseCatcher
 

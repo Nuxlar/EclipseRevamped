@@ -1,3 +1,7 @@
+**1.3.3**
+
+- Removed new E6 until I can think of something more interesting (currently just removes E6, can be changed in config)
+
 **1.3.2**
 
 - Fixes new E1 applying twice, doubling the credits for the tp event

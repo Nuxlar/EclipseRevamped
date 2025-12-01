@@ -18,7 +18,7 @@ namespace EclipseRevamped
     public const string PluginGUID = PluginAuthor + "." + PluginName;
     public const string PluginAuthor = "Nuxlar";
     public const string PluginName = "EclipseRevamped";
-    public const string PluginVersion = "1.3.2";
+    public const string PluginVersion = "1.3.3";
 
     internal static Main Instance { get; private set; }
     public static string PluginDirectory { get; private set; }
@@ -71,7 +71,6 @@ namespace EclipseRevamped
       if (shouldChangeE6.Value)
       {
         IL.RoR2.DeathRewards.OnKilledServer += RemoveVanillaE6;
-        On.RoR2.CharacterMaster.OnBodyStart += AddNewE6;
       }
 
       stopwatch.Stop();
@@ -182,18 +181,6 @@ namespace EclipseRevamped
         Log.Error("EclipseRevamped: Failed to remove vanilla E6");
     }
 
-    private void AddNewE6(On.RoR2.CharacterMaster.orig_OnBodyStart orig, CharacterMaster self, CharacterBody body)
-    {
-      orig(self, body);
-      if (Run.instance && Run.instance.selectedDifficulty >= DifficultyIndex.Eclipse6)
-      {
-        if (body.teamComponent && body.inventory && (body.teamComponent.teamIndex == TeamIndex.Monster || body.teamComponent.teamIndex == TeamIndex.Void))
-        {
-          body.inventory.GiveItemPermanent(DLC1Content.Items.PermanentDebuffOnHit, 1);
-        }
-      }
-    }
-
     private void ChangeDescriptions()
     {
       string str1 = "Starts at baseline Monsoon difficulty.\n";
@@ -202,7 +189,7 @@ namespace EclipseRevamped
       string str4 = shouldChangeE3.Value ? "\n<mspace=0.5em>(5)</mspace> Enemy Elites: <style=cIsHealth>+20%</style></style>" : "\n<mspace=0.5em>(3)</mspace> Ally Fall Damage: <style=cIsHealth>+100% and lethal</style></style>";
       string str5 = "\n<mspace=0.5em>(4)</mspace> Enemies: <style=cIsHealth>+40% Faster</style></style>";
       string str6 = shouldChangeE5.Value ? "\n<mspace=0.5em>(5)</mspace> Ally Healing: <style=cIsHealth>-25%</style></style>" : "\n<mspace=0.5em>(5)</mspace> Ally Healing: <style=cIsHealth>-50%</style></style>";
-      string str7 = shouldChangeE6.Value ? "\n<mspace=0.5em>(6)</mspace> Enemy attacks <style=cIsHealth>permanently reduce armor</style></style>" : "\n<mspace=0.5em>(6)</mspace> Enemy Gold Drops: <style=cIsHealth>-20%</style></style>";
+      string str7 = shouldChangeE6.Value ? "\n<mspace=0.5em>(6)</mspace><style=cIsHealth> Nothing</style></style>" : "\n<mspace=0.5em>(6)</mspace> Enemy Gold Drops: <style=cIsHealth>-20%</style></style>";
       string str8 = "\n<mspace=0.5em>(7)</mspace> Enemy Cooldowns: <style=cIsHealth>-50%</style></style>";
       string str9 = "\n<mspace=0.5em>(8)</mspace> Allies recieve <style=cIsHealth>permanent damage</style></style>";
       string str10 = "\"You only celebrate in the light... because I allow it.\" \n\n";
