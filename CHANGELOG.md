@@ -1,3 +1,7 @@
+**1.3.4**
+
+- Fixed typo with new E3's in-game text saying `5` instead of `3`
+
 **1.3.3**
 
 - Removed new E6 until I can think of something more interesting (currently just removes E6, can be changed in config)
